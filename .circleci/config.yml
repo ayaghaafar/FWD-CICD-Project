@@ -41,7 +41,7 @@ jobs:
       - checkout
       - run:
           name: "backend job"
-          command: "cd frontend"
+          command: "cd backend"
       - run:
           name: "backend npm install"
           command: "npm install"
@@ -57,22 +57,34 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: 
-          command: |
-            cd frontend
-            npm install
-            npm run test
-             exit 1
+      - run:
+          name: "Frontend job"
+          command: "cd backend"
+      - run:
+          name: "backend npm install"
+          command: "npm install"
+      - run:
+          name: "Frontend npm build"
+          command: "npm run test"
+      - slack/notify:
+          channel: circleci
+          event: fail
+          template: basic_fail_1
+    
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run: 
-          command: |
-              cd frontend
-              npm install
-              npm audit --audit-level=critical
+      - run:
+          name: "Frontend job"
+          command: "cd frontend"
+      - run:
+          name: "Frontend npm install"
+          command: "npm install"
+      - run:
+          name: "Frontend npm build"
+          command: "npm audit --audit-level=critical"
       - slack/notify:
           channel: circleci
           event: fail
@@ -81,16 +93,19 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout
-      - run: 
-          command: |
-              cd frontend
-              npm install
-              npm audit --audit-level=critical
+      - run:
+          name: "Frontend job"
+          command: "cd backend"
+      - run:
+          name: "Frontend npm install"
+          command: "npm install"
+      - run:
+          name: "Frontend npm build"
+          command: "npm audit --audit-level=critical"
       - slack/notify:
           channel: circleci
           event: fail
-          template: basic_fail_1              
+          template: basic_fail_1             
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
